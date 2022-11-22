@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CustomizableLobbies")]
-[assembly: AssemblyDescription("https://github.com/zman2024/Onward17-CustomizableLobbies")]
+[assembly: AssemblyDescription("https://github.com/zman2024/Onward-CustomizableLobbies")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("https://github.com/zman2024/Onward17-CustomizableLobbies")]
+[assembly: AssemblyCompany("https://github.com/zman2024/Onward-CustomizableLobbies")]
 [assembly: AssemblyProduct("CustomizableLobbies")]
 [assembly: AssemblyCopyright("Zman2024")]
 [assembly: AssemblyTrademark("")]
