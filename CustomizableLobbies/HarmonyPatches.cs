@@ -10,37 +10,36 @@ using HarmonyLib;
 namespace CustomizableLobbies
 {
     // I never really liked harmony but man this looks ugly
+    [HarmonyPatch]
     public class HarmonyPatches
     {
         // MenuServerSettings \\
         
-        [HarmonyPatch(typeof(MenuServerSettings), "SetButtonStates")]
-        public static void SetButtonStatesPatches(MenuServerSettings __instance, object[] __args)
+        [HarmonyPatch(typeof(MenuServerSettings), nameof(MenuServerSettings.SetButtonStates))]
+        public static void SetButtonStatesPatches(MenuServerSettings __instance, object[] __args, ref MenuItemPopout ___VRSpectatingButton,
+            ref MenuItemPopout ___AllowObserversButton, ref MenuItemPopout ___AllowTimeoutButton, ref MenuItemPopout[] ___TimeoutLengthButtons,
+            ref MenuItemPopout[] ___RoundCountButtons, ref MenuItemPopout[] ___RoundLengthButtons)
         {
-            bool disabled = false;
-            var exposed = Traverse.Create(__instance);
-            exposed.Field<MenuItemPopout>("VRSpectatingButton").Value.SetDisabledInvertClickable(disabled);
-            exposed.Field<MenuItemPopout>("AllowObserversButton").Value.SetDisabledInvertClickable(disabled);
-            exposed.Field<MenuItemPopout>("AllowTimeoutButton").Value.SetDisabledInvertClickable(disabled);
+            // Confusing name, but it sets buttonEnabled = !param (false = enabled, true = disabled)
+            ___VRSpectatingButton.SetDisabledInvertClickable(false);
+            ___AllowObserversButton.SetDisabledInvertClickable(false);
+            ___AllowTimeoutButton.SetDisabledInvertClickable(false);
 
+            var exposed = Traverse.Create(__instance);
             var fcnSetButtonsDisabled = exposed.Method("SetButtonsDisabled", new Type[] { typeof(MenuItemPopout[]), typeof(bool) });
-            fcnSetButtonsDisabled.GetValue(exposed.Field<MenuItemPopout[]>("TimeoutLengthButtons").Value, disabled);
-            fcnSetButtonsDisabled.GetValue(exposed.Field<MenuItemPopout[]>("RoundCountButtons").Value, disabled);
-            fcnSetButtonsDisabled.GetValue(exposed.Field<MenuItemPopout[]>("RoundLengthButtons").Value, disabled);
+            fcnSetButtonsDisabled.GetValue(___TimeoutLengthButtons, false);
+            fcnSetButtonsDisabled.GetValue(___RoundCountButtons, false);
+            fcnSetButtonsDisabled.GetValue(___RoundLengthButtons, false);
 
         }
 
         // MultiplayerCreateServerMenu \\
 
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(MultiplayerCreateServerMenu), "GameModeSelected")]
-        public static void GameModeSelectedPatched(MultiplayerCreateServerMenu __instance, object[] __args)
+        public static void GameModeSelectedPostfix(MultiplayerCreateServerMenu __instance)
         {
-            __instance.GameSettings.Gamemode = (OnwardGameMode)__args[0];
             __instance.LockToPrivate = false; // Never force rooms to be private
-
-            var exposed = Traverse.Create(__instance);
-            exposed.Field<UnityEngine.GameObject>("ModeSelectMenu").Value.SetActive(false);
-            exposed.Field<UnityEngine.GameObject>("MapSelectMenu").Value.SetActive(true);
         }
 
     }
