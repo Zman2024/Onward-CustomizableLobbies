@@ -29,28 +29,28 @@ namespace CustomizableLobbies
 
         public void Start()
         {
-            Logger.LogInfo("Starting...");
-
-            Logger.LogInfo("Loading config...");
-            VerifyConfig();
-
-            Logger.LogInfo("Modifying maximum players...");
+            HarmonyPatches.Logger = this.Logger;
             try
             {
+                Logger.LogInfo("Loading config...");
+                VerifyConfig();
+
                 // yeah i should just use tryget but i already typed this awful code so oh well
+                Logger.LogInfo("Modifying maximum players...");
                 BuildSettings.maxPlayers = ((ConfigEntry<int>)Config[ConfigInfo.PvPLobbyMaxKey]).Value;
                 BuildSettings.maxCOOPPlayers = ((ConfigEntry<int>)Config[ConfigInfo.CoopLobbyMaxKey]).Value;
+
+                Logger.LogInfo("Applying Harmony Patches...");
+                mHarmony = Harmony.CreateAndPatchAll(typeof(HarmonyPatches));
+
+                Logger.LogInfo("Finished");
+
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex);
                 return;
             }
-            Logger.LogInfo("Done!");
-
-            Logger.LogInfo("Applying Harmony Patches...");
-            mHarmony = Harmony.CreateAndPatchAll(typeof(HarmonyPatches));
-            Logger.LogInfo("Done!");
         }
         
         private void VerifyConfig()

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
+using System.Reflection;
 
 namespace CustomizableLobbies
 {
@@ -13,30 +14,38 @@ namespace CustomizableLobbies
     [HarmonyPatch]
     public class HarmonyPatches
     {
+        public static BepInEx.Logging.ManualLogSource Logger;
+
         // MenuServerSettings \\
         
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(MenuServerSettings), nameof(MenuServerSettings.SetButtonStates))]
-        public static void SetButtonStatesPatches(MenuServerSettings __instance, object[] __args, ref MenuItemPopout ___VRSpectatingButton,
-            ref MenuItemPopout ___AllowObserversButton, ref MenuItemPopout ___AllowTimeoutButton, ref MenuItemPopout[] ___TimeoutLengthButtons,
-            ref MenuItemPopout[] ___RoundCountButtons, ref MenuItemPopout[] ___RoundLengthButtons)
+        public static bool SetButtonStatesPatches(MenuServerSettings __instance, object[] __args)
         {
+            MenuItemPopout VRSpectatingButton = __instance.GetPrivateField<MenuItemPopout>("VRSpectatingButton");
+            MenuItemPopout AllowObserversButton = __instance.GetPrivateField<MenuItemPopout>("AllowObserversButton");
+            MenuItemPopout AllowTimeoutButton = __instance.GetPrivateField<MenuItemPopout>("AllowTimeoutButton");
+
+            MenuItemPopout[] TimeoutLengthButtons = __instance.GetPrivateField<MenuItemPopout[]>("TimeoutLengthButtons");
+            MenuItemPopout[] RoundCountButtons = __instance.GetPrivateField<MenuItemPopout[]>("RoundCountButtons");
+            MenuItemPopout[] RoundLengthButtons = __instance.GetPrivateField<MenuItemPopout[]>("RoundLengthButtons");
+
             // Confusing name, but it sets buttonEnabled = !param (false = enabled, true = disabled)
-            ___VRSpectatingButton.SetDisabledInvertClickable(false);
-            ___AllowObserversButton.SetDisabledInvertClickable(false);
-            ___AllowTimeoutButton.SetDisabledInvertClickable(false);
+            VRSpectatingButton.SetDisabledInvertClickable(false);
+            AllowObserversButton.SetDisabledInvertClickable(false);
+            AllowTimeoutButton.SetDisabledInvertClickable(false);
 
-            var exposed = Traverse.Create(__instance);
-            var fcnSetButtonsDisabled = exposed.Method("SetButtonsDisabled", new Type[] { typeof(MenuItemPopout[]), typeof(bool) });
-            fcnSetButtonsDisabled.GetValue(___TimeoutLengthButtons, false);
-            fcnSetButtonsDisabled.GetValue(___RoundCountButtons, false);
-            fcnSetButtonsDisabled.GetValue(___RoundLengthButtons, false);
+            __instance.InvokePrivateMethod("SetButtonsDisabled", TimeoutLengthButtons, false);
+            __instance.InvokePrivateMethod("SetButtonsDisabled", RoundCountButtons, false);
+            __instance.InvokePrivateMethod("SetButtonsDisabled", RoundLengthButtons, false);
 
+            return false;
         }
 
         // MultiplayerCreateServerMenu \\
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(MultiplayerCreateServerMenu), "GameModeSelected")]
+        [HarmonyPatch(typeof(MultiplayerCreateServerMenu), nameof(MultiplayerCreateServerMenu.GamemodeSelected))]
         public static void GameModeSelectedPostfix(MultiplayerCreateServerMenu __instance)
         {
             __instance.LockToPrivate = false; // Never force rooms to be private
