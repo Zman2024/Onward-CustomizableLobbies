@@ -22,7 +22,7 @@ namespace CustomizableLobbies
 
     }
 
-    [BepInPlugin("Zman2024-CustomizableLobbies", "Customizable Lobbies", "0.1.0.0")]
+    [BepInPlugin("Zman2024-CustomizableLobbies", "Customizable Lobbies", "0.1.1")]
     public class CustomizableLobbiesPlugin : BaseUnityPlugin
     {
         private Harmony mHarmony;
