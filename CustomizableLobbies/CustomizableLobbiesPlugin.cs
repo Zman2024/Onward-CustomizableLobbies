@@ -27,24 +27,26 @@ namespace CustomizableLobbies
     {
         private Harmony mHarmony;
 
+        private ConfigEntry<int> MaxPlayersPvP;
+        private ConfigEntry<int> MaxPlayersCOOP;
+
         public void Start()
         {
+            // Share logger with the patches
             HarmonyPatches.Logger = this.Logger;
             try
             {
                 Logger.LogInfo("Loading config...");
-                VerifyConfig();
-
-                // yeah i should just use tryget but i already typed this awful code so oh well
+                InitConfig();
+                
                 Logger.LogInfo("Modifying maximum players...");
-                BuildSettings.maxPlayers = ((ConfigEntry<int>)Config[ConfigInfo.PvPLobbyMaxKey]).Value;
-                BuildSettings.maxCOOPPlayers = ((ConfigEntry<int>)Config[ConfigInfo.CoopLobbyMaxKey]).Value;
+                BuildSettings.maxPlayers = MaxPlayersPvP.Value;
+                BuildSettings.maxCOOPPlayers = MaxPlayersCOOP.Value;
 
                 Logger.LogInfo("Applying Harmony Patches...");
                 mHarmony = Harmony.CreateAndPatchAll(typeof(HarmonyPatches));
 
                 Logger.LogInfo("Finished");
-
             }
             catch (Exception ex)
             {
@@ -53,29 +55,10 @@ namespace CustomizableLobbies
             }
         }
         
-        private void VerifyConfig()
+        private void InitConfig()
         {
-            if (Config.Count == 0)
-            {
-                CreateConfig();
-                return;
-            }
-
-            // yeah it's hideous, but it works for now
-            if (!Config.ContainsKey(ConfigInfo.PvPLobbyMaxKey))
-            {
-                Config.Bind(ConfigInfo.PvPLobbyMaxKey, ConfigInfo.PvPMaxDefault, new ConfigDescription("The maximum number of players for a PvP lobby"));
-            }
-            if (!Config.ContainsKey(ConfigInfo.CoopLobbyMaxKey))
-            {
-                Config.Bind(ConfigInfo.CoopLobbyMaxKey, ConfigInfo.CoopMaxDefault, new ConfigDescription("The maximum number of players for a PvE lobby"));
-            }
-        }
-
-        private void CreateConfig()
-        {
-            Config.Bind(ConfigInfo.PvPLobbyMaxKey, ConfigInfo.PvPMaxDefault, new ConfigDescription("The maximum number of players for a PvP lobby"));
-            Config.Bind(ConfigInfo.CoopLobbyMaxKey, ConfigInfo.CoopMaxDefault, new ConfigDescription("The maximum number of players for a PvE lobby"));
+            MaxPlayersPvP = Config.Bind(ConfigInfo.PvPLobbyMaxKey, ConfigInfo.PvPMaxDefault, new ConfigDescription("The maximum number of players for a PvP lobby"));
+            MaxPlayersCOOP = Config.Bind(ConfigInfo.CoopLobbyMaxKey, ConfigInfo.CoopMaxDefault, new ConfigDescription("The maximum number of players for a PvE/COOP lobby"));
             Config.Save();
         }
 

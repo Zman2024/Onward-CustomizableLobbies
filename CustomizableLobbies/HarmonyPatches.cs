@@ -20,7 +20,7 @@ namespace CustomizableLobbies
         
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MenuServerSettings), nameof(MenuServerSettings.SetButtonStates))]
-        public static bool SetButtonStatesPatches(MenuServerSettings __instance, object[] __args)
+        public static bool SetButtonStates_Prefix(MenuServerSettings __instance, object[] __args)
         {
             MenuItemPopout VRSpectatingButton = __instance.GetPrivateField<MenuItemPopout>("VRSpectatingButton");
             MenuItemPopout AllowObserversButton = __instance.GetPrivateField<MenuItemPopout>("AllowObserversButton");
@@ -42,13 +42,23 @@ namespace CustomizableLobbies
             return false;
         }
 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(MenuServerSettings), nameof(MenuServerSettings.SetRoundLengthAndChallengeBtnStateAndInfo))]
+        public static void SetRoundLengthAndChallengeBtnStateAndInfo_Postfix(MenuServerSettings __instance)
+        {
+            // Always allow round changing
+            MenuItemPopout[] RoundLengthButtons = __instance.GetPrivateField<MenuItemPopout[]>("RoundLengthButtons");
+            __instance.InvokePrivateMethod("SetButtonsDisabled", RoundLengthButtons, false);
+        }
+
         // MultiplayerCreateServerMenu \\
 
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(MultiplayerCreateServerMenu), nameof(MultiplayerCreateServerMenu.GamemodeSelected))]
-        public static void GameModeSelectedPostfix(MultiplayerCreateServerMenu __instance)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MultiplayerCreateServerMenu), "IsGameModeForcedPrivate")]
+        public static bool IsGameModeForcedPrivate_Prefix(MultiplayerCreateServerMenu __instance, ref bool __result)
         {
-            __instance.LockToPrivate = false; // Never force rooms to be private
+            // We dont want the original one to run
+            return __result = false;
         }
 
     }

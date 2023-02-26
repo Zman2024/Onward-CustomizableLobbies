@@ -41,11 +41,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>.\Assembly-CSharp.dll</HintPath>
+      <HintPath>libs\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>F:\SteamGames\steamapps\common\Onward\Game\Onward_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>libs\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
@@ -95,15 +95,15 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>F:\SteamGames\steamapps\common\Onward\Game\Onward_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>libs\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>F:\SteamGames\steamapps\common\Onward\Game\Onward_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>F:\SteamGames\steamapps\common\Onward\Game\Onward_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>libs\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

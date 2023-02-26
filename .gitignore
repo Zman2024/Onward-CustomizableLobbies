@@ -261,5 +261,5 @@ __pycache__/
 *.pyc
 
 
-Assembly-CSharp.dll
 BepInEx/
+libs/
